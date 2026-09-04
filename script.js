@@ -1,30 +1,26 @@
-/* =========================================================
-   PRELOADER
-========================================================= */
+"use strict";
+
+
 
 window.addEventListener("load", () => {
+    const preloader = document.getElementById("preloader");
 
-  const preloader = document.getElementById("preloader");
+    if (!preloader) return;
 
-  setTimeout(() => {
-
-    preloader.classList.add("hide");
-
-  }, 700);
-
+    setTimeout(() => {
+        preloader.classList.add("hide");
+    }, 700);
 });
 
 
-/* =========================================================
-   TYPING EFFECT
-========================================================= */
+
 
 const roles = [
-  "Full Stack Developer",
-  "React Developer",
-  "Python Developer",
-  "AI/ML Enthusiast",
-  "Creative Problem Solver"
+    "Full Stack Developer",
+    "React Developer",
+    "Python Developer",
+    "AI/ML Enthusiast",
+    "Creative Problem Solver"
 ];
 
 const typeElement = document.getElementById("typeRole");
@@ -35,423 +31,602 @@ let deleting = false;
 
 function typeLoop() {
 
-  const currentRole = roles[roleIndex];
+    if (!typeElement) return;
 
-  if (!deleting) {
+    const currentRole = roles[roleIndex];
 
-    typeElement.textContent =
-      currentRole.substring(0, charIndex + 1);
+    if (!deleting) {
 
-    charIndex++;
+        typeElement.textContent =
+            currentRole.substring(0, charIndex + 1);
 
-    if (charIndex === currentRole.length) {
+        charIndex++;
 
-      deleting = true;
+        if (charIndex >= currentRole.length) {
 
-      setTimeout(typeLoop, 1500);
+            deleting = true;
 
-      return;
+            setTimeout(typeLoop, 1500);
+            return;
+        }
 
+        setTimeout(typeLoop, 85);
+
+    } else {
+
+        typeElement.textContent =
+            currentRole.substring(0, charIndex - 1);
+
+        charIndex--;
+
+        if (charIndex <= 0) {
+
+            charIndex = 0;
+            deleting = false;
+
+            roleIndex++;
+
+            if (roleIndex >= roles.length) {
+                roleIndex = 0;
+            }
+
+            setTimeout(typeLoop, 400);
+            return;
+        }
+
+        setTimeout(typeLoop, 45);
     }
-
-  } else {
-
-    typeElement.textContent =
-      currentRole.substring(0, charIndex - 1);
-
-    charIndex--;
-
-    if (charIndex === 0) {
-
-      deleting = false;
-
-      roleIndex++;
-
-      if (roleIndex >= roles.length) {
-        roleIndex = 0;
-      }
-
-    }
-
-  }
-
-  setTimeout(
-    typeLoop,
-    deleting ? 45 : 85
-  );
-
 }
 
-typeLoop();
+if (typeElement) {
+    typeLoop();
+}
 
 
-/* =========================================================
-   MOBILE MENU
-========================================================= */
+
 
 const menuBtn = document.getElementById("menuBtn");
 const navMenu = document.getElementById("navMenu");
 
-menuBtn.addEventListener("click", () => {
+if (menuBtn && navMenu) {
 
-  navMenu.classList.toggle("open");
+    menuBtn.addEventListener("click", () => {
 
-  const icon = menuBtn.querySelector("i");
+        const isOpen =
+            navMenu.classList.toggle("open");
 
-  if (navMenu.classList.contains("open")) {
+        menuBtn.setAttribute(
+            "aria-expanded",
+            String(isOpen)
+        );
 
-    icon.classList.remove("fa-bars");
-    icon.classList.add("fa-xmark");
+        const icon =
+            menuBtn.querySelector("i");
 
-  } else {
+        if (!icon) return;
 
-    icon.classList.remove("fa-xmark");
-    icon.classList.add("fa-bars");
+        if (isOpen) {
 
-  }
+            icon.classList.remove("fa-bars");
+            icon.classList.add("fa-xmark");
 
-});
+        } else {
+
+            icon.classList.remove("fa-xmark");
+            icon.classList.add("fa-bars");
+        }
+    });
+}
 
 
-/* CLOSE MENU WHEN CLICKING LINK */
+
 
 document.querySelectorAll(".nav-link").forEach(link => {
 
-  link.addEventListener("click", () => {
+    link.addEventListener("click", () => {
 
-    navMenu.classList.remove("open");
+        if (!navMenu || !menuBtn) return;
 
-    const icon = menuBtn.querySelector("i");
+        navMenu.classList.remove("open");
 
-    icon.classList.remove("fa-xmark");
-    icon.classList.add("fa-bars");
+        menuBtn.setAttribute(
+            "aria-expanded",
+            "false"
+        );
 
-  });
+        const icon =
+            menuBtn.querySelector("i");
 
+        if (!icon) return;
+
+        icon.classList.remove("fa-xmark");
+        icon.classList.add("fa-bars");
+    });
 });
 
 
-/* =========================================================
-   ACTIVE NAVIGATION
-========================================================= */
 
-const sections = document.querySelectorAll("section[id]");
-const navLinks = document.querySelectorAll(".nav-link");
+
+const sections =
+    document.querySelectorAll("section[id]");
+
+const navLinks =
+    document.querySelectorAll(".nav-link");
 
 function updateActiveNav() {
 
-  let currentSection = "";
+    let currentSection = "";
 
-  sections.forEach(section => {
+    sections.forEach(section => {
 
-    const sectionTop =
-      section.offsetTop - 180;
+        const sectionTop =
+            section.offsetTop - 180;
 
-    if (window.scrollY >= sectionTop) {
+        if (window.scrollY >= sectionTop) {
 
-      currentSection = section.getAttribute("id");
+            currentSection =
+                section.getAttribute("id");
+        }
+    });
 
-    }
+    navLinks.forEach(link => {
 
-  });
+        link.classList.remove("active");
 
-  navLinks.forEach(link => {
+        const href =
+            link.getAttribute("href");
 
-    link.classList.remove("active");
-
-    if (
-      link.getAttribute("href") ===
-      `#${currentSection}`
-    ) {
-
-      link.classList.add("active");
-
-    }
-
-  });
-
+        if (href === `#${currentSection}`) {
+            link.classList.add("active");
+        }
+    });
 }
 
 window.addEventListener(
-  "scroll",
-  updateActiveNav
+    "scroll",
+    updateActiveNav,
+    { passive: true }
 );
 
 
-/* =========================================================
-   SCROLL PROGRESS
-========================================================= */
+
 
 const progress =
-  document.getElementById("scrollProgress");
+    document.getElementById("scrollProgress");
 
-window.addEventListener("scroll", () => {
+function updateScrollProgress() {
 
-  const scrollTop = window.scrollY;
+    if (!progress) return;
 
-  const documentHeight =
-    document.documentElement.scrollHeight -
-    window.innerHeight;
+    const scrollTop =
+        window.scrollY;
 
-  const percentage =
-    (scrollTop / documentHeight) * 100;
+    const documentHeight =
+        document.documentElement.scrollHeight -
+        window.innerHeight;
 
-  progress.style.width =
-    `${percentage}%`;
+    if (documentHeight <= 0) {
 
-});
+        progress.style.width = "0%";
+        return;
+    }
+
+    const percentage =
+        (scrollTop / documentHeight) * 100;
+
+    progress.style.width =
+        `${Math.min(100, Math.max(0, percentage))}%`;
+}
+
+window.addEventListener(
+    "scroll",
+    updateScrollProgress,
+    { passive: true }
+);
 
 
-/* =========================================================
-   REVEAL ANIMATION
-========================================================= */
+
 
 const revealElements =
-  document.querySelectorAll(".reveal");
+    document.querySelectorAll(".reveal");
 
-const observer =
-  new IntersectionObserver(
-    entries => {
+if ("IntersectionObserver" in window) {
 
-      entries.forEach(entry => {
+    const observer =
+        new IntersectionObserver(
+            entries => {
 
-        if (entry.isIntersecting) {
+                entries.forEach(entry => {
 
-          entry.target.classList.add("show");
+                    if (entry.isIntersecting) {
 
-          observer.unobserve(entry.target);
+                        entry.target.classList.add("show");
 
-        }
+                        observer.unobserve(
+                            entry.target
+                        );
+                    }
+                });
 
-      });
+            },
+            {
+                threshold: 0.12
+            }
+        );
 
-    },
-    {
-      threshold: 0.12
-    }
-  );
+    revealElements.forEach(element => {
+        observer.observe(element);
+    });
+
+} else {
+
+    revealElements.forEach(element => {
+        element.classList.add("show");
+    });
+}
 
 
-revealElements.forEach(element => {
-
-  observer.observe(element);
-
-});
-
-
-/* =========================================================
-   BACK TO TOP
-========================================================= */
 
 const toTop =
-  document.getElementById("toTop");
+    document.getElementById("toTop");
 
-window.addEventListener("scroll", () => {
+function updateBackToTop() {
 
-  if (window.scrollY > 600) {
+    if (!toTop) return;
 
-    toTop.classList.add("show");
+    if (window.scrollY > 600) {
 
-  } else {
+        toTop.classList.add("show");
 
-    toTop.classList.remove("show");
+    } else {
 
-  }
+        toTop.classList.remove("show");
+    }
+}
 
-});
+window.addEventListener(
+    "scroll",
+    updateBackToTop,
+    { passive: true }
+);
+
+if (toTop) {
+
+    toTop.addEventListener(
+        "click",
+        () => {
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+        }
+    );
+}
 
 
-toTop.addEventListener("click", () => {
 
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
-
-});
-
-
-/* =========================================================
-   CONTACT FORM
-========================================================= */
 
 const contactForm =
-  document.getElementById("contactForm");
+    document.getElementById("contactForm");
 
-contactForm.addEventListener("submit", event => {
+if (contactForm) {
 
-  event.preventDefault();
+    contactForm.addEventListener(
+        "submit",
+        async event => {
 
-  const name =
-    document.getElementById("name").value.trim();
+            event.preventDefault();
 
-  const email =
-    document.getElementById("email").value.trim();
+            const nameInput =
+                document.getElementById("name");
 
-  const subject =
-    document.getElementById("subject").value.trim();
+            const emailInput =
+                document.getElementById("email");
 
-  const message =
-    document.getElementById("message").value.trim();
+            const subjectInput =
+                document.getElementById("subject");
 
-
-  if (
-    !name ||
-    !email ||
-    !subject ||
-    !message
-  ) {
-
-    alert("Please fill in all fields.");
-
-    return;
-
-  }
+            const messageInput =
+                document.getElementById("message");
 
 
-  const mailSubject =
-    encodeURIComponent(subject);
+            if (
+                !nameInput ||
+                !emailInput ||
+                !subjectInput ||
+                !messageInput
+            ) {
 
-  const mailBody =
-    encodeURIComponent(
-      `Hello Deepika,\n\n` +
-      `Name: ${name}\n` +
-      `Email: ${email}\n\n` +
-      `${message}`
+                console.error(
+                    "Contact form fields are missing."
+                );
+
+                return;
+            }
+
+
+            const name =
+                nameInput.value.trim();
+
+            const email =
+                emailInput.value.trim();
+
+            const subject =
+                subjectInput.value.trim();
+
+            const message =
+                messageInput.value.trim();
+
+
+            
+
+            if (
+                !name ||
+                !email ||
+                !subject ||
+                !message
+            ) {
+
+                alert(
+                    "Please fill in all fields."
+                );
+
+                return;
+            }
+
+
+          
+
+            const emailPattern =
+                /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailPattern.test(email)) {
+
+                alert(
+                    "Please enter a valid email address."
+                );
+
+                return;
+            }
+
+
+           
+
+            const submitButton =
+                contactForm.querySelector(
+                    "button[type='submit']"
+                );
+
+            if (!submitButton) return;
+
+            const originalButtonHTML =
+                submitButton.innerHTML;
+
+            submitButton.disabled = true;
+
+            submitButton.innerHTML =
+                `
+                <span>Sending...</span>
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                `;
+
+
+            
+
+            const formData =
+                new FormData(contactForm);
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        contactForm.action,
+                        {
+                            method: "POST",
+                            body: formData,
+                            headers: {
+                                "Accept": "application/json"
+                            }
+                        }
+                    );
+
+
+                
+
+                if (response.ok) {
+
+                    alert(
+                        "Message sent successfully! Thank you for contacting me."
+                    );
+
+                    contactForm.reset();
+
+                } else {
+
+                    let errorMessage =
+                        "Something went wrong. Please try again.";
+
+                    try {
+
+                        const data =
+                            await response.json();
+
+                        if (
+                            data &&
+                            Array.isArray(data.errors) &&
+                            data.errors.length > 0
+                        ) {
+
+                            errorMessage =
+                                data.errors
+                                    .map(error => error.message)
+                                    .join("\n");
+                        }
+
+                    } catch (jsonError) {
+
+                        console.error(
+                            "Formspree response error:",
+                            jsonError
+                        );
+                    }
+
+                    alert(errorMessage);
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Formspree Error:",
+                    error
+                );
+
+                alert(
+                    "Unable to send the message. Please check your internet connection and try again."
+                );
+
+            } finally {
+
+                submitButton.disabled = false;
+
+                submitButton.innerHTML =
+                    originalButtonHTML;
+            }
+        }
     );
+}
 
 
-  window.location.href =
-    `mailto:yourmail@gmail.com?subject=${mailSubject}&body=${mailBody}`;
 
-});
-
-
-/* =========================================================
-   CARD MOUSE EFFECT
-========================================================= */
 
 const cards =
-  document.querySelectorAll(
-    ".skill-card, .project-card"
-  );
-
+    document.querySelectorAll(
+        ".skill-card, .project-card"
+    );
 
 cards.forEach(card => {
 
-  card.addEventListener("mousemove", event => {
+    card.addEventListener(
+        "mousemove",
+        event => {
 
-    const rect =
-      card.getBoundingClientRect();
+            const rect =
+                card.getBoundingClientRect();
 
-    const x =
-      event.clientX - rect.left;
+            const x =
+                event.clientX - rect.left;
 
-    const y =
-      event.clientY - rect.top;
+            const y =
+                event.clientY - rect.top;
 
-    const centerX =
-      rect.width / 2;
+            const centerX =
+                rect.width / 2;
 
-    const centerY =
-      rect.height / 2;
+            const centerY =
+                rect.height / 2;
 
-    const rotateX =
-      ((y - centerY) / centerY) * -2;
+            const rotateX =
+                ((y - centerY) / centerY) * -2;
 
-    const rotateY =
-      ((x - centerX) / centerX) * 2;
+            const rotateY =
+                ((x - centerX) / centerX) * 2;
 
-    card.style.transform =
-      `perspective(800px)
-       rotateX(${rotateX}deg)
-       rotateY(${rotateY}deg)
-       translateY(-5px)`;
+            card.style.transform =
+                `
+                perspective(800px)
+                rotateX(${rotateX}deg)
+                rotateY(${rotateY}deg)
+                translateY(-5px)
+                `;
+        }
+    );
 
-  });
 
+    card.addEventListener(
+        "mouseleave",
+        () => {
 
-  card.addEventListener("mouseleave", () => {
-
-    card.style.transform = "";
-
-  });
-
+            card.style.transform = "";
+        }
+    );
 });
 
 
-/* =========================================================
-   HERO MOUSE PARALLAX
-========================================================= */
+
 
 const heroVisual =
-  document.querySelector(".hero-visual");
+    document.querySelector(".hero-visual");
 
 if (heroVisual) {
 
-  heroVisual.addEventListener(
-    "mousemove",
-    event => {
-
-      const rect =
-        heroVisual.getBoundingClientRect();
-
-      const x =
-        (event.clientX - rect.left) /
-        rect.width;
-
-      const y =
-        (event.clientY - rect.top) /
-        rect.height;
-
-      const codeCard =
+    const codeCard =
         heroVisual.querySelector(".code-card");
 
-      codeCard.style.transform =
-        `
-        perspective(1000px)
-        rotateY(${(x - .5) * 8}deg)
-        rotateX(${(y - .5) * -5}deg)
-        translateY(-5px)
-        `;
+    if (codeCard) {
 
+        heroVisual.addEventListener(
+            "mousemove",
+            event => {
+
+                const rect =
+                    heroVisual.getBoundingClientRect();
+
+                const x =
+                    (event.clientX - rect.left) /
+                    rect.width;
+
+                const y =
+                    (event.clientY - rect.top) /
+                    rect.height;
+
+                const rotateY =
+                    (x - 0.5) * 8;
+
+                const rotateX =
+                    (y - 0.5) * -5;
+
+                codeCard.style.transform =
+                    `
+                    perspective(1000px)
+                    rotateY(${rotateY}deg)
+                    rotateX(${rotateX}deg)
+                    translateY(-5px)
+                    `;
+            }
+        );
+
+
+        heroVisual.addEventListener(
+            "mouseleave",
+            () => {
+
+                codeCard.style.transform = "";
+            }
+        );
     }
-  );
-
-
-  heroVisual.addEventListener(
-    "mouseleave",
-    () => {
-
-      const codeCard =
-        heroVisual.querySelector(".code-card");
-
-      codeCard.style.transform =
-        `
-        perspective(1000px)
-        rotateY(-5deg)
-        rotateX(2deg)
-        `;
-
-    }
-  );
-
 }
 
 
-/* =========================================================
-   DYNAMIC YEAR
-========================================================= */
+
 
 const copyright =
-  document.querySelector(".copyright");
+    document.querySelector(".copyright");
 
 if (copyright) {
 
-  const year =
-    new Date().getFullYear();
+    const currentYear =
+        new Date().getFullYear();
 
-  copyright.innerHTML =
-    `© ${year} Deepika C. All Rights Reserved.`;
-
+    copyright.textContent =
+        `© ${currentYear} Deepika C. All Rights Reserved.`;
 }
+
+
+
+
+updateActiveNav();
+updateScrollProgress();
+updateBackToTop();
